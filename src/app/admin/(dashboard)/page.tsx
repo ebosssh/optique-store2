@@ -3,6 +3,8 @@ import { Package, ShoppingBag, TrendingUp } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/format";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminOverviewPage() {
   const [productCount, orderCount, newOrders, revenue] = await Promise.all([
     prisma.product.count(),

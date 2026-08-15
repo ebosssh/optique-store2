@@ -5,9 +5,7 @@ import { CATEGORY_LABELS } from "@/lib/format";
 import { ProductCard } from "@/components/product-card";
 import { CatalogFilters } from "@/components/catalog-filters";
 
-export function generateStaticParams() {
-  return Object.keys(CATEGORY_LABELS).map((category) => ({ category }));
-}
+export const dynamic = "force-dynamic";
 
 export default async function CatalogCategoryPage({
   params,

@@ -5,6 +5,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
 import { formatPrice, SITE } from "@/lib/format";
 
+export const dynamic = "force-dynamic";
+
 export default async function CheckoutSuccessPage({
   searchParams,
 }: {

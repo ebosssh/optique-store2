@@ -4,6 +4,8 @@ import { ProductForm } from "@/components/admin/product-form";
 import { DeleteProductButton } from "@/components/admin/delete-product-button";
 import { updateProduct } from "../../actions";
 
+export const dynamic = "force-dynamic";
+
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [product, categories] = await Promise.all([

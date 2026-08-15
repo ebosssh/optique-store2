@@ -6,6 +6,8 @@ import { ProductImage } from "@/components/product-image";
 import { prisma } from "@/lib/prisma";
 import { CATEGORY_LABELS, SITE } from "@/lib/format";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home() {
   const [sale, newArrivals] = await Promise.all([
     prisma.product.findMany({ where: { oldPrice: { not: null } }, take: 4, orderBy: { createdAt: "desc" } }),

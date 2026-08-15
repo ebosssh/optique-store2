@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/format";
 import { OrderStatusForm } from "@/components/admin/order-status-form";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const order = await prisma.order.findUnique({ where: { id }, include: { items: true } });

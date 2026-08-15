@@ -8,6 +8,8 @@ import { ProductCard } from "@/components/product-card";
 import { Badge } from "@/components/ui/badge";
 import { formatPrice, CATEGORY_LABELS } from "@/lib/format";
 
+export const dynamic = "force-dynamic";
+
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const product = await prisma.product.findUnique({ where: { slug }, include: { category: true } });
