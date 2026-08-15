@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum ProductType {
+  GLASSES
+  SUNGLASSES
+  LENSES
+  ACCESSORY
+  CARE
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  slug      String    @unique
+  name      String
+  type      ProductType
+  order     Int       @default(0)
+  products  Product[]
+}
+
+enum OrderStatus {
+  NEW
+  CONFIRMED
+  CANCELLED
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  name        String
+  phone       String
+  city        String
+  address     String
+  comment     String?
+  paymentType String      @default("cod")
+  status      OrderStatus @default(NEW)
+  total       Int
+  items       OrderItem[]
+  createdAt   DateTime    @default(now())
+}
+
+model OrderItem {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id])
+  productId   String
+  productName String
+  price       Int
+  quantity    Int
+}
+
+model Product {
+  id            String      @id @default(cuid())
+  slug          String      @unique
+  name          String
+  brand         String
+  type          ProductType
+  price         Int
+  oldPrice      Int?
+  description   String
+  imageEmoji    String      @default("👓")
+  colorHex      String      @default("#1f2937")
+  inStock       Boolean     @default(true)
+  isNew         Boolean     @default(false)
+  packSize      String?
+  gender        String      @default("унісекс")
+  categoryId    String
+  category      Category    @relation(fields: [categoryId], references: [id])
+  createdAt     DateTime    @default(now())
+}
