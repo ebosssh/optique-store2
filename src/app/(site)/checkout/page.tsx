@@ -44,7 +44,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           ...form,
           paymentType,
-          items: items.map((i) => ({ productId: i.productId, name: i.name, price: i.price, quantity: i.quantity })),
+          items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
         }),
       });
       if (!res.ok) {

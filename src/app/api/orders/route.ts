@@ -8,7 +8,7 @@ type OrderPayload = {
   address: string;
   comment?: string;
   paymentType: string;
-  items: { productId: string; name: string; price: number; quantity: number }[];
+  items: { productId: string; quantity: number }[];
 };
 
 export async function POST(request: Request) {
@@ -21,7 +21,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Кошик порожній" }, { status: 400 });
   }
 
-  const total = body.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const quantityByProductId = new Map<string, number>();
+  for (const i of body.items) {
+    const quantity = Math.trunc(Number(i.quantity));
+    if (!i.productId || !Number.isFinite(quantity) || quantity <= 0) {
+      return NextResponse.json({ error: "Некоректний товар у кошику" }, { status: 400 });
+    }
+    quantityByProductId.set(i.productId, (quantityByProductId.get(i.productId) ?? 0) + quantity);
+  }
+
+  const products = await prisma.product.findMany({
+    where: { id: { in: [...quantityByProductId.keys()] } },
+  });
+  if (products.length !== quantityByProductId.size) {
+    return NextResponse.json({ error: "Деякі товари більше не доступні" }, { status: 400 });
+  }
+
+  const total = products.reduce((sum, p) => sum + p.price * quantityByProductId.get(p.id)!, 0);
 
   const order = await prisma.order.create({
     data: {
@@ -33,11 +49,11 @@ export async function POST(request: Request) {
       paymentType: body.paymentType,
       total,
       items: {
-        create: body.items.map((i) => ({
-          productId: i.productId,
-          productName: i.name,
-          price: i.price,
-          quantity: i.quantity,
+        create: products.map((p) => ({
+          productId: p.id,
+          productName: p.name,
+          price: p.price,
+          quantity: quantityByProductId.get(p.id)!,
         })),
       },
     },
