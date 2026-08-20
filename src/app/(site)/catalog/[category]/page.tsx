@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { CATEGORY_LABELS } from "@/lib/format";
@@ -36,7 +37,7 @@ export default async function CatalogCategoryPage({
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-10">
       <nav className="text-xs text-muted-foreground">
-        <a href="/" className="hover:text-primary">Головна</a> / <span>{meta.title}</span>
+        <Link href="/" className="hover:text-primary">Головна</Link> / <span>{meta.title}</span>
       </nav>
       <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
         <div>

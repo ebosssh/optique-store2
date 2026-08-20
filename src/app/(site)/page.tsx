@@ -139,7 +139,7 @@ export default async function Home() {
             <Truck className="size-6 text-primary" />
             <div>
               <div className="text-sm font-semibold">Доставка по Україні</div>
-              <div className="text-xs text-muted-foreground">Нова пошта, Укрпошта, кур'єр</div>
+              <div className="text-xs text-muted-foreground">Нова пошта, Укрпошта, кур&apos;єр</div>
             </div>
           </div>
           <div className="flex items-center gap-3 rounded-xl border bg-card p-4">

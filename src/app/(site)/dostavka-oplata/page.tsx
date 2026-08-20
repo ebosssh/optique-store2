@@ -5,7 +5,7 @@ export default function DeliveryPaymentPage() {
 
       <h2 className="mt-8 text-lg font-semibold">Доставка</h2>
       <ul className="mt-3 list-inside list-disc space-y-2 text-muted-foreground">
-        <li>Нова пошта (відділення або кур'єром) — 1–3 робочих дні</li>
+        <li>Нова пошта (відділення або кур&apos;єром) — 1–3 робочих дні</li>
         <li>Укрпошта — 3–5 робочих днів</li>
         <li>Самовивіз із салону — у день замовлення</li>
       </ul>
