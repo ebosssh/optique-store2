@@ -18,7 +18,7 @@ export function AddToCartButton({
     price: number;
     colorHex: string;
     imageEmoji: string;
-    imageUrl: string | null;
+    images: string[];
   };
   size?: "sm" | "default" | "lg";
   full?: boolean;
@@ -41,7 +41,7 @@ export function AddToCartButton({
           price: product.price,
           colorHex: product.colorHex,
           imageEmoji: product.imageEmoji,
-          imageUrl: product.imageUrl,
+          imageUrl: product.images[0] ?? null,
         });
         setAdded(true);
         setTimeout(() => setAdded(false), 1500);

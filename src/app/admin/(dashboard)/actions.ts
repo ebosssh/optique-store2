@@ -15,6 +15,13 @@ function toInt(value: FormDataEntryValue | null): number | undefined {
   return Number.isFinite(n) ? Math.round(n) : undefined;
 }
 
+function parseImages(value: FormDataEntryValue | null): string[] {
+  return String(value ?? "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
 function revalidateStorefront(categorySlug?: string, slug?: string) {
   revalidatePath("/");
   revalidatePath("/admin/products");
@@ -39,7 +46,7 @@ export async function createProduct(formData: FormData) {
     description: String(formData.get("description") ?? "").trim(),
     gender: String(formData.get("gender") ?? "унісекс"),
     packSize: (formData.get("packSize") ? String(formData.get("packSize")).trim() : null) || null,
-    imageUrl: (formData.get("imageUrl") ? String(formData.get("imageUrl")).trim() : null) || null,
+    images: parseImages(formData.get("images")),
     colorHex: String(formData.get("colorHex") ?? "#1f2937"),
     inStock: formData.get("inStock") === "on",
     isNew: formData.get("isNew") === "on",
@@ -81,7 +88,7 @@ export async function updateProduct(productId: string, formData: FormData) {
       description: String(formData.get("description") ?? "").trim(),
       gender: String(formData.get("gender") ?? "унісекс"),
       packSize: (formData.get("packSize") ? String(formData.get("packSize")).trim() : null) || null,
-      imageUrl: (formData.get("imageUrl") ? String(formData.get("imageUrl")).trim() : null) || null,
+      images: parseImages(formData.get("images")),
       colorHex: String(formData.get("colorHex") ?? "#1f2937"),
       inStock: formData.get("inStock") === "on",
       isNew: formData.get("isNew") === "on",

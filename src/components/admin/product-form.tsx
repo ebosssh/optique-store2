@@ -99,17 +99,18 @@ export function ProductForm({
       </div>
 
       <div>
-        <Label htmlFor="imageUrl">Посилання на фото</Label>
-        <Input
-          id="imageUrl"
-          name="imageUrl"
-          type="text"
-          placeholder="https://... або /products/..."
-          defaultValue={product?.imageUrl ?? undefined}
+        <Label htmlFor="images">Посилання на фото</Label>
+        <Textarea
+          id="images"
+          name="images"
+          rows={3}
+          placeholder={"https://...\n/products/..."}
+          defaultValue={product?.images.join("\n")}
           className="mt-1.5"
         />
         <p className="mt-1 text-xs text-muted-foreground">
-          Необов&apos;язково. Без посилання показується іконка-заглушка в кольорі нижче.
+          Необов&apos;язково, по одному посиланню на рядок. Кілька фото показуються каруселлю на сторінці товару.
+          Без жодного — іконка-заглушка в кольорі нижче.
         </p>
       </div>
 

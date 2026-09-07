@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ShieldCheck, Stethoscope, Truck } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { ProductImage } from "@/components/product-image";
+import { ProductGallery } from "@/components/product-gallery";
 import { AddToCartButton } from "@/components/add-to-cart-button";
 import { ProductCard } from "@/components/product-card";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +36,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {product.oldPrice && <Badge className="bg-accent text-accent-foreground">Знижка</Badge>}
             {product.isNew && <Badge variant="secondary">Новинка</Badge>}
           </div>
-          <ProductImage type={product.type} colorHex={product.colorHex} imageUrl={product.imageUrl} className="border" />
+          <ProductGallery images={product.images} type={product.type} colorHex={product.colorHex} className="border" />
         </div>
 
         <div>

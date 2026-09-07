@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-type ProductType = "GLASSES" | "SUNGLASSES" | "LENSES" | "ACCESSORY" | "CARE";
+export type ProductType = "GLASSES" | "SUNGLASSES" | "LENSES" | "ACCESSORY" | "CARE";
 
 function GlassesIcon({ color, sunglasses }: { color: string; sunglasses?: boolean }) {
   return (
