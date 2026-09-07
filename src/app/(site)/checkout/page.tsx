@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { CityWarehousePicker } from "@/components/checkout/city-warehouse-picker";
 import { useCart } from "@/store/cart";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -76,14 +77,12 @@ export default function CheckoutPage() {
               <Label htmlFor="phone">Телефон *</Label>
               <Input id="phone" required type="tel" placeholder="+380..." className="mt-1.5" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
             </div>
-            <div>
-              <Label htmlFor="city">Місто *</Label>
-              <Input id="city" required className="mt-1.5" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
-            </div>
-            <div>
-              <Label htmlFor="address">Відділення / адреса доставки *</Label>
-              <Input id="address" required className="mt-1.5" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
-            </div>
+            <CityWarehousePicker
+              city={form.city}
+              address={form.address}
+              onCityChange={(city) => setForm((f) => ({ ...f, city }))}
+              onAddressChange={(address) => setForm((f) => ({ ...f, address }))}
+            />
           </div>
           <div>
             <Label htmlFor="comment">Коментар до замовлення</Label>
