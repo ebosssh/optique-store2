@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { notifyNewOrder } from "@/lib/telegram";
 
 type OrderPayload = {
   name: string;
@@ -44,25 +45,32 @@ export async function POST(request: Request) {
 
   const total = products.reduce((sum, p) => sum + p.price * quantityByProductId.get(p.id)!, 0);
 
+  const name = body.name.trim();
+  const phone = body.phone.trim();
+  const city = body.city.trim();
+  const address = body.address.trim();
+  const comment = body.comment?.trim() || null;
+  const items = products.map((p) => ({
+    productId: p.id,
+    productName: p.name,
+    price: p.price,
+    quantity: quantityByProductId.get(p.id)!,
+  }));
+
   const order = await prisma.order.create({
     data: {
-      name: body.name.trim(),
-      phone: body.phone.trim(),
-      city: body.city.trim(),
-      address: body.address.trim(),
-      comment: body.comment?.trim() || null,
+      name,
+      phone,
+      city,
+      address,
+      comment,
       paymentType: body.paymentType,
       total,
-      items: {
-        create: products.map((p) => ({
-          productId: p.id,
-          productName: p.name,
-          price: p.price,
-          quantity: quantityByProductId.get(p.id)!,
-        })),
-      },
+      items: { create: items },
     },
   });
+
+  await notifyNewOrder({ id: order.id, name, phone, city, address, comment, paymentType: body.paymentType, total, items });
 
   return NextResponse.json({ id: order.id });
 }
