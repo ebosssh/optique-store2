@@ -103,8 +103,8 @@ export function ProductForm({
         <Input
           id="imageUrl"
           name="imageUrl"
-          type="url"
-          placeholder="https://..."
+          type="text"
+          placeholder="https://... або /products/..."
           defaultValue={product?.imageUrl ?? undefined}
           className="mt-1.5"
         />
