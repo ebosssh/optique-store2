@@ -99,6 +99,21 @@ export function ProductForm({
       </div>
 
       <div>
+        <Label htmlFor="imageUrl">Посилання на фото</Label>
+        <Input
+          id="imageUrl"
+          name="imageUrl"
+          type="url"
+          placeholder="https://..."
+          defaultValue={product?.imageUrl ?? undefined}
+          className="mt-1.5"
+        />
+        <p className="mt-1 text-xs text-muted-foreground">
+          Необов&apos;язково. Без посилання показується іконка-заглушка в кольорі нижче.
+        </p>
+      </div>
+
+      <div>
         <Label htmlFor="description">Опис</Label>
         <Textarea id="description" name="description" rows={4} defaultValue={product?.description} className="mt-1.5" />
       </div>

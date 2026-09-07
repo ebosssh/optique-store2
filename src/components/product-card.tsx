@@ -13,7 +13,7 @@ export function ProductCard({ product }: { product: Product }) {
           {product.oldPrice && <Badge className="bg-accent text-accent-foreground">Знижка</Badge>}
           {product.isNew && <Badge variant="secondary">Новинка</Badge>}
         </div>
-        <ProductImage type={product.type} colorHex={product.colorHex} />
+        <ProductImage type={product.type} colorHex={product.colorHex} imageUrl={product.imageUrl} />
       </Link>
       <div className="flex flex-1 flex-col gap-1 px-4 pb-4">
         <span className="text-xs uppercase tracking-wide text-muted-foreground">{product.brand}</span>

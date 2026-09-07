@@ -64,6 +64,7 @@ model Product {
   oldPrice      Int?
   description   String
   imageEmoji    String      @default("👓")
+  imageUrl      String?
   colorHex      String      @default("#1f2937")
   inStock       Boolean     @default(true)
   isNew         Boolean     @default(false)

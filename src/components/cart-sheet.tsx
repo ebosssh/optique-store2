@@ -33,7 +33,7 @@ export function CartSheet({ children }: { children: React.ReactNode }) {
             <div className="flex-1 space-y-4 overflow-y-auto px-4">
               {items.map((item) => (
                 <div key={item.productId} className="flex gap-3">
-                  <ProductImage type="GLASSES" colorHex={item.colorHex} className="w-20 shrink-0" />
+                  <ProductImage type="GLASSES" colorHex={item.colorHex} imageUrl={item.imageUrl} className="w-20 shrink-0" />
                   <div className="flex flex-1 flex-col gap-1">
                     <span className="text-xs uppercase text-muted-foreground">{item.brand}</span>
                     <span className="line-clamp-2 text-sm font-medium">{item.name}</span>

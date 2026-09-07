@@ -36,7 +36,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             {product.oldPrice && <Badge className="bg-accent text-accent-foreground">Знижка</Badge>}
             {product.isNew && <Badge variant="secondary">Новинка</Badge>}
           </div>
-          <ProductImage type={product.type} colorHex={product.colorHex} className="border" />
+          <ProductImage type={product.type} colorHex={product.colorHex} imageUrl={product.imageUrl} className="border" />
         </div>
 
         <div>

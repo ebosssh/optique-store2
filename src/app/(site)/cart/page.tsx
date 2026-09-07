@@ -32,7 +32,7 @@ export default function CartPage() {
         <div className="space-y-4 lg:col-span-2">
           {items.map((item) => (
             <div key={item.productId} className="flex gap-4 rounded-xl border bg-card p-4">
-              <ProductImage type="GLASSES" colorHex={item.colorHex} className="w-24 shrink-0 sm:w-28" />
+              <ProductImage type="GLASSES" colorHex={item.colorHex} imageUrl={item.imageUrl} className="w-24 shrink-0 sm:w-28" />
               <div className="flex flex-1 flex-col gap-1">
                 <span className="text-xs uppercase text-muted-foreground">{item.brand}</span>
                 <Link href={`/product/${item.slug}`} className="font-medium hover:text-primary">{item.name}</Link>

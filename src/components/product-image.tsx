@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 type ProductType = "GLASSES" | "SUNGLASSES" | "LENSES" | "ACCESSORY" | "CARE";
@@ -56,12 +57,22 @@ function CareIcon({ color }: { color: string }) {
 export function ProductImage({
   type,
   colorHex,
+  imageUrl,
   className,
 }: {
   type: ProductType;
   colorHex: string;
+  imageUrl?: string | null;
   className?: string;
 }) {
+  if (imageUrl) {
+    return (
+      <div className={cn("relative aspect-square w-full overflow-hidden rounded-xl bg-muted", className)}>
+        <Image src={imageUrl} alt="" fill sizes="(max-width: 768px) 50vw, 300px" className="object-cover" />
+      </div>
+    );
+  }
+
   return (
     <div
       className={cn("flex aspect-square w-full items-center justify-center rounded-xl", className)}

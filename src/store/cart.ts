@@ -11,6 +11,7 @@ export type CartItem = {
   price: number;
   colorHex: string;
   imageEmoji: string;
+  imageUrl: string | null;
   quantity: number;
 };
 
