@@ -5,13 +5,13 @@ export function formatPrice(value: number): string {
 export const SITE = {
   name: "OptikaZir",
   fullName: "OptikaZir — салон оптики",
-  phone: "+38 (067) 123-45-67",
-  phoneHref: "tel:+380671234567",
+  phone: "+38 (066) 988-02-03",
+  phoneHref: "tel:+380669880203",
   storePhone: "+38 (067) 987-65-43",
   storePhoneHref: "tel:+380679876543",
   email: "info@optikazir.ua",
-  city: "Київ",
-  address: "вул. Хрещатик, 22",
+  city: "Первомайськ",
+  address: "вул. Шевченка, 15",
   hours: "Пн–Нд: 09:00–20:00",
   instagram: "https://instagram.com",
 };

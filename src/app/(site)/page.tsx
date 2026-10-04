@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Award, Glasses, ShieldCheck, Stethoscope, Truck, Users } from "lucide-react";
+import { Activity, ArrowRight, Glasses, Monitor, ScanEye, ShieldCheck, Stethoscope, Truck } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { ProductCard } from "@/components/product-card";
 import { ProductImage } from "@/components/product-image";
@@ -22,7 +22,7 @@ export default async function Home() {
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-16 md:grid-cols-2 md:py-24">
           <div>
             <span className="inline-flex rounded-full bg-primary-foreground/10 px-3 py-1 text-xs font-medium">
-              Оптика, якій довіряють
+              30 років у оптичній сфері
             </span>
             <h1 className="mt-4 font-heading text-4xl font-bold leading-tight md:text-5xl">
               Окуляри та контактні лінзи для чіткого зору
@@ -68,24 +68,20 @@ export default async function Home() {
       <section className="border-y bg-secondary/40">
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 py-10 text-center md:grid-cols-4">
           <div>
-            <Award className="mx-auto size-6 text-primary" />
-            <div className="mt-2 text-2xl font-bold">12+</div>
-            <div className="text-sm text-muted-foreground">років на ринку</div>
+            <ScanEye className="mx-auto size-6 text-primary" />
+            <div className="mt-2 text-sm font-semibold">Підбір контактних лінз</div>
           </div>
           <div>
             <Glasses className="mx-auto size-6 text-primary" />
-            <div className="mt-2 text-2xl font-bold">15 000+</div>
-            <div className="text-sm text-muted-foreground">виготовлених окулярів</div>
+            <div className="mt-2 text-sm font-semibold">Підбір окулярів</div>
           </div>
           <div>
-            <ShieldCheck className="mx-auto size-6 text-primary" />
-            <div className="mt-2 text-2xl font-bold">40+</div>
-            <div className="text-sm text-muted-foreground">брендів в асортименті</div>
+            <Monitor className="mx-auto size-6 text-primary" />
+            <div className="mt-2 text-sm font-semibold">Комп&apos;ютерна діагностика зору</div>
           </div>
           <div>
-            <Users className="mx-auto size-6 text-primary" />
-            <div className="mt-2 text-2xl font-bold">6</div>
-            <div className="text-sm text-muted-foreground">лікарів-офтальмологів</div>
+            <Activity className="mx-auto size-6 text-primary" />
+            <div className="mt-2 text-sm font-semibold">Апаратне лікування</div>
           </div>
         </div>
       </section>

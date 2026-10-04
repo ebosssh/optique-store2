@@ -1,12 +1,13 @@
-import { Clock, Eye, Glasses, Phone, ScanEye, Stethoscope } from "lucide-react";
+import { Activity, Clock, Glasses, Monitor, Phone, ScanEye, Stethoscope } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { SITE } from "@/lib/format";
 
 const SERVICES = [
-  { icon: Eye, title: "Перевірка гостроти зору", desc: "Комп'ютерна та суб'єктивна діагностика зору на сучасному обладнанні." },
+  { icon: Monitor, title: "Комп'ютерна діагностика зору", desc: "Комп'ютерна та суб'єктивна діагностика зору на сучасному обладнанні." },
   { icon: ScanEye, title: "Підбір контактних лінз", desc: "Індивідуальний підбір лінз та навчання правил користування." },
   { icon: Glasses, title: "Підбір окулярів", desc: "Рекомендації щодо оправи та лінз відповідно до рецепта і способу життя." },
   { icon: Stethoscope, title: "Консультація офтальмолога", desc: "Огляд, консультації з приводу зору у дорослих та дітей." },
+  { icon: Activity, title: "Апаратне лікування", desc: "Апаратні методики для покращення та підтримки зору." },
 ];
 
 export default function DoctorAppointmentPage() {
