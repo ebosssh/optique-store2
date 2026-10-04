@@ -55,7 +55,10 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
         <ul className="mt-3 space-y-2 rounded-xl border bg-card p-4 text-sm">
           {order.items.map((i) => (
             <li key={i.id} className="flex justify-between">
-              <span className="text-muted-foreground">{i.productName} × {i.quantity}</span>
+              <span className="text-muted-foreground">
+                {i.productName}
+                {i.diopter && ` (${i.diopter})`} × {i.quantity}
+              </span>
               <span className="font-medium">{formatPrice(i.price * i.quantity)}</span>
             </li>
           ))}

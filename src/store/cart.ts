@@ -12,14 +12,19 @@ export type CartItem = {
   colorHex: string;
   imageEmoji: string;
   imageUrl: string | null;
+  diopter: string | null;
   quantity: number;
 };
+
+function sameLine(a: Pick<CartItem, "productId" | "diopter">, b: Pick<CartItem, "productId" | "diopter">): boolean {
+  return a.productId === b.productId && a.diopter === b.diopter;
+}
 
 type CartState = {
   items: CartItem[];
   add: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
-  remove: (productId: string) => void;
-  setQuantity: (productId: string, quantity: number) => void;
+  remove: (productId: string, diopter?: string | null) => void;
+  setQuantity: (productId: string, quantity: number, diopter?: string | null) => void;
   clear: () => void;
   totalCount: () => number;
   totalPrice: () => number;
@@ -31,22 +36,21 @@ export const useCart = create<CartState>()(
       items: [],
       add: (item, quantity = 1) => {
         set((state) => {
-          const existing = state.items.find((i) => i.productId === item.productId);
+          const existing = state.items.find((i) => sameLine(i, item));
           if (existing) {
             return {
-              items: state.items.map((i) =>
-                i.productId === item.productId ? { ...i, quantity: i.quantity + quantity } : i
-              ),
+              items: state.items.map((i) => (sameLine(i, item) ? { ...i, quantity: i.quantity + quantity } : i)),
             };
           }
           return { items: [...state.items, { ...item, quantity }] };
         });
       },
-      remove: (productId) => set((state) => ({ items: state.items.filter((i) => i.productId !== productId) })),
-      setQuantity: (productId, quantity) =>
+      remove: (productId, diopter = null) =>
+        set((state) => ({ items: state.items.filter((i) => !sameLine(i, { productId, diopter })) })),
+      setQuantity: (productId, quantity, diopter = null) =>
         set((state) => ({
           items: state.items
-            .map((i) => (i.productId === productId ? { ...i, quantity } : i))
+            .map((i) => (sameLine(i, { productId, diopter }) ? { ...i, quantity } : i))
             .filter((i) => i.quantity > 0),
         })),
       clear: () => set({ items: [] }),

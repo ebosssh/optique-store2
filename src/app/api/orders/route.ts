@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { notifyNewOrder } from "@/lib/telegram";
+import { DIOPTER_OPTIONS } from "@/lib/diopter";
 
 type OrderPayload = {
   name: string;
@@ -9,8 +10,12 @@ type OrderPayload = {
   address: string;
   comment?: string;
   paymentType: string;
-  items: { productId: string; quantity: number }[];
+  items: { productId: string; quantity: number; diopter?: string | null }[];
 };
+
+type Line = { productId: string; diopter: string | null; quantity: number };
+
+const MAX_QUANTITY_PER_ITEM = 50;
 
 export async function POST(request: Request) {
   const body = (await request.json()) as OrderPayload;
@@ -22,40 +27,60 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Кошик порожній" }, { status: 400 });
   }
 
-  const MAX_QUANTITY_PER_ITEM = 50;
-
-  const quantityByProductId = new Map<string, number>();
+  // A diopter distinguishes otherwise-identical lines, so two different
+  // diopters of the same product must stay separate order lines.
+  const lines = new Map<string, Line>();
   for (const i of body.items) {
     const quantity = Math.trunc(Number(i.quantity));
     if (!i.productId || !Number.isFinite(quantity) || quantity <= 0 || quantity > MAX_QUANTITY_PER_ITEM) {
       return NextResponse.json({ error: "Некоректний товар у кошику" }, { status: 400 });
     }
-    quantityByProductId.set(i.productId, (quantityByProductId.get(i.productId) ?? 0) + quantity);
+    const diopter = i.diopter ? String(i.diopter).trim() : null;
+    if (diopter && !DIOPTER_OPTIONS.includes(diopter)) {
+      return NextResponse.json({ error: "Некоректна діоптрія" }, { status: 400 });
+    }
+    const key = `${i.productId}::${diopter ?? ""}`;
+    const existing = lines.get(key);
+    if (existing) existing.quantity += quantity;
+    else lines.set(key, { productId: i.productId, diopter, quantity });
   }
 
-  const products = await prisma.product.findMany({
-    where: { id: { in: [...quantityByProductId.keys()] } },
-  });
-  if (products.length !== quantityByProductId.size) {
+  const productIds = [...new Set([...lines.values()].map((l) => l.productId))];
+  const products = await prisma.product.findMany({ where: { id: { in: productIds } } });
+  if (products.length !== productIds.length) {
     return NextResponse.json({ error: "Деякі товари більше не доступні" }, { status: 400 });
   }
   if (products.some((p) => !p.inStock)) {
     return NextResponse.json({ error: "Деякі товари закінчились на складі" }, { status: 400 });
   }
 
-  const total = products.reduce((sum, p) => sum + p.price * quantityByProductId.get(p.id)!, 0);
+  const productById = new Map(products.map((p) => [p.id, p]));
+
+  for (const line of lines.values()) {
+    const product = productById.get(line.productId)!;
+    if (product.type === "LENSES" && !line.diopter) {
+      return NextResponse.json({ error: `Вкажіть діоптрію для товару «${product.name}»` }, { status: 400 });
+    }
+  }
+
+  const items = [...lines.values()].map((line) => {
+    const product = productById.get(line.productId)!;
+    return {
+      productId: product.id,
+      productName: product.name,
+      diopter: line.diopter,
+      price: product.price,
+      quantity: line.quantity,
+    };
+  });
+
+  const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
   const name = body.name.trim();
   const phone = body.phone.trim();
   const city = body.city.trim();
   const address = body.address.trim();
   const comment = body.comment?.trim() || null;
-  const items = products.map((p) => ({
-    productId: p.id,
-    productName: p.name,
-    price: p.price,
-    quantity: quantityByProductId.get(p.id)!,
-  }));
 
   const order = await prisma.order.create({
     data: {

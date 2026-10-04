@@ -105,4 +105,54 @@ describe("POST /api/orders", () => {
     expect(createArgs.data.items.create[0].quantity).toBe(5);
     expect(createArgs.data.total).toBe(5000);
   });
+
+  it("rejects a LENSES product ordered without a diopter", async () => {
+    findMany.mockResolvedValue([{ id: "p1", name: "Softlens Day 30", type: "LENSES", price: 780, inStock: true }]);
+
+    const res = await POST(makeRequest({ ...baseCustomer, items: [{ productId: "p1", quantity: 1 }] }));
+
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toMatch(/діоптрію/);
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it("rejects a diopter value outside the known range", async () => {
+    findMany.mockResolvedValue([{ id: "p1", name: "Softlens Day 30", type: "LENSES", price: 780, inStock: true }]);
+
+    const res = await POST(makeRequest({ ...baseCustomer, items: [{ productId: "p1", quantity: 1, diopter: "-99.00" }] }));
+
+    expect(res.status).toBe(400);
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it("accepts a LENSES product with a valid diopter and stores it on the line", async () => {
+    findMany.mockResolvedValue([{ id: "p1", name: "Softlens Day 30", type: "LENSES", price: 780, inStock: true }]);
+    create.mockResolvedValue({ id: "order-3" });
+
+    const res = await POST(makeRequest({ ...baseCustomer, items: [{ productId: "p1", quantity: 2, diopter: "-2.25" }] }));
+
+    expect(res.status).toBe(200);
+    const createArgs = create.mock.calls[0][0];
+    expect(createArgs.data.items.create[0]).toMatchObject({ productId: "p1", diopter: "-2.25", quantity: 2 });
+  });
+
+  it("keeps two different diopters of the same product as separate order lines", async () => {
+    findMany.mockResolvedValue([{ id: "p1", name: "Softlens Day 30", type: "LENSES", price: 780, inStock: true }]);
+    create.mockResolvedValue({ id: "order-4" });
+
+    await POST(
+      makeRequest({
+        ...baseCustomer,
+        items: [
+          { productId: "p1", quantity: 1, diopter: "-2.25" },
+          { productId: "p1", quantity: 1, diopter: "-1.75" },
+        ],
+      })
+    );
+
+    const createArgs = create.mock.calls[0][0];
+    expect(createArgs.data.items.create).toHaveLength(2);
+    expect(createArgs.data.items.create.map((i: { diopter: string }) => i.diopter).sort()).toEqual(["-1.75", "-2.25"]);
+    expect(createArgs.data.total).toBe(1560);
+  });
 });

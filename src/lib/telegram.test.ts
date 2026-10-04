@@ -46,6 +46,21 @@ describe("notifyNewOrder", () => {
     expect(payload.text).toContain("5000 грн");
   });
 
+  it("includes the diopter in the item line when present", async () => {
+    process.env.TELEGRAM_BOT_TOKEN = "test-token";
+    process.env.TELEGRAM_CHAT_ID = "12345";
+    vi.mocked(fetch).mockResolvedValue(new Response("{}", { status: 200 }));
+
+    await notifyNewOrder({
+      ...baseOrder,
+      items: [{ productName: "Softlens Day 30", diopter: "-2.25", price: 780, quantity: 1 }],
+    });
+
+    const options = vi.mocked(fetch).mock.calls[0][1];
+    const payload = JSON.parse(options!.body as string);
+    expect(payload.text).toContain("Softlens Day 30 (-2.25)");
+  });
+
   it("does not throw when the Telegram API call fails", async () => {
     process.env.TELEGRAM_BOT_TOKEN = "test-token";
     process.env.TELEGRAM_CHAT_ID = "12345";

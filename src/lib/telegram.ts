@@ -7,7 +7,7 @@ type OrderForNotification = {
   comment: string | null;
   paymentType: string;
   total: number;
-  items: { productName: string; price: number; quantity: number }[];
+  items: { productName: string; diopter?: string | null; price: number; quantity: number }[];
 };
 
 function buildMessage(order: OrderForNotification): string {
@@ -23,7 +23,8 @@ function buildMessage(order: OrderForNotification): string {
   lines.push(`Оплата: ${order.paymentType === "cod" ? "при отриманні" : "на картку"}`);
   lines.push("", "Товари:");
   for (const item of order.items) {
-    lines.push(`- ${item.productName} × ${item.quantity} — ${item.price * item.quantity} грн`);
+    const diopterSuffix = item.diopter ? ` (${item.diopter})` : "";
+    lines.push(`- ${item.productName}${diopterSuffix} × ${item.quantity} — ${item.price * item.quantity} грн`);
   }
   lines.push("", `Разом: ${order.total} грн`);
   return lines.join("\n");

@@ -50,6 +50,7 @@ model OrderItem {
   order       Order    @relation(fields: [orderId], references: [id])
   productId   String
   productName String
+  diopter     String?
   price       Int
   quantity    Int
 }
