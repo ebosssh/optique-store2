@@ -1,3 +1,5 @@
+import { formatPrescriptionInline, type Prescription } from "@/lib/prescription";
+
 type OrderForNotification = {
   id: string;
   name: string;
@@ -7,7 +9,7 @@ type OrderForNotification = {
   comment: string | null;
   paymentType: string;
   total: number;
-  items: { productName: string; diopter?: string | null; price: number; quantity: number }[];
+  items: ({ productName: string; price: number; quantity: number } & Prescription)[];
 };
 
 function buildMessage(order: OrderForNotification): string {
@@ -23,8 +25,9 @@ function buildMessage(order: OrderForNotification): string {
   lines.push(`Оплата: ${order.paymentType === "cod" ? "при отриманні" : "на картку"}`);
   lines.push("", "Товари:");
   for (const item of order.items) {
-    const diopterSuffix = item.diopter ? ` (${item.diopter})` : "";
-    lines.push(`- ${item.productName}${diopterSuffix} × ${item.quantity} — ${item.price * item.quantity} грн`);
+    const prescription = formatPrescriptionInline(item);
+    const suffix = prescription ? ` (${prescription})` : "";
+    lines.push(`- ${item.productName}${suffix} × ${item.quantity} — ${item.price * item.quantity} грн`);
   }
   lines.push("", `Разом: ${order.total} грн`);
   return lines.join("\n");

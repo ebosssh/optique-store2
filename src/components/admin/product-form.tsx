@@ -128,6 +128,10 @@ export function ProductForm({
           <input type="checkbox" name="isNew" defaultChecked={product?.isNew ?? false} className="size-4 rounded border-input" />
           Позначити як новинку
         </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="isToric" defaultChecked={product?.isToric ?? false} className="size-4 rounded border-input" />
+          Торичні лінзи (сфера / циліндр / вісь замість діоптрії)
+        </label>
       </div>
 
       <Button type="submit" size="lg">

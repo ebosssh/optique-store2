@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { ProductImage } from "@/components/product-image";
 import { useCart } from "@/store/cart";
 import { formatPrice } from "@/lib/format";
+import { formatPrescriptionLine } from "@/lib/prescription";
 
 export default function CartPage() {
   const { items, remove, setQuantity, totalPrice } = useCart();
@@ -30,31 +31,35 @@ export default function CartPage() {
 
       <div className="mt-8 grid gap-8 lg:grid-cols-3">
         <div className="space-y-4 lg:col-span-2">
-          {items.map((item) => (
-            <div key={`${item.productId}-${item.diopter ?? ""}`} className="flex gap-4 rounded-xl border bg-card p-4">
-              <ProductImage type="GLASSES" colorHex={item.colorHex} imageUrl={item.imageUrl} className="w-24 shrink-0 sm:w-28" />
-              <div className="flex flex-1 flex-col gap-1">
-                <span className="text-xs uppercase text-muted-foreground">{item.brand}</span>
-                <Link href={`/product/${item.slug}`} className="font-medium hover:text-primary">{item.name}</Link>
-                {item.diopter && <span className="text-xs text-muted-foreground">Діоптрія: {item.diopter}</span>}
-                <div className="mt-auto flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <Button size="icon" variant="outline" className="size-8" onClick={() => setQuantity(item.productId, item.quantity - 1, item.diopter)}>
-                      <Minus className="size-3.5" />
-                    </Button>
-                    <span className="w-6 text-center">{item.quantity}</span>
-                    <Button size="icon" variant="outline" className="size-8" onClick={() => setQuantity(item.productId, item.quantity + 1, item.diopter)}>
-                      <Plus className="size-3.5" />
-                    </Button>
+          {items.map((item) => {
+            const prescription = formatPrescriptionLine(item);
+            const key = `${item.productId}-${item.diopter ?? ""}-${item.sphere ?? ""}-${item.cylinder ?? ""}-${item.axis ?? ""}`;
+            return (
+              <div key={key} className="flex gap-4 rounded-xl border bg-card p-4">
+                <ProductImage type="GLASSES" colorHex={item.colorHex} imageUrl={item.imageUrl} className="w-24 shrink-0 sm:w-28" />
+                <div className="flex flex-1 flex-col gap-1">
+                  <span className="text-xs uppercase text-muted-foreground">{item.brand}</span>
+                  <Link href={`/product/${item.slug}`} className="font-medium hover:text-primary">{item.name}</Link>
+                  {prescription && <span className="text-xs text-muted-foreground">{prescription}</span>}
+                  <div className="mt-auto flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <Button size="icon" variant="outline" className="size-8" onClick={() => setQuantity(item, item.quantity - 1)}>
+                        <Minus className="size-3.5" />
+                      </Button>
+                      <span className="w-6 text-center">{item.quantity}</span>
+                      <Button size="icon" variant="outline" className="size-8" onClick={() => setQuantity(item, item.quantity + 1)}>
+                        <Plus className="size-3.5" />
+                      </Button>
+                    </div>
+                    <span className="text-lg font-semibold">{formatPrice(item.price * item.quantity)}</span>
                   </div>
-                  <span className="text-lg font-semibold">{formatPrice(item.price * item.quantity)}</span>
                 </div>
+                <Button size="icon" variant="ghost" className="size-8 shrink-0" onClick={() => remove(item)}>
+                  <Trash2 className="size-4" />
+                </Button>
               </div>
-              <Button size="icon" variant="ghost" className="size-8 shrink-0" onClick={() => remove(item.productId, item.diopter)}>
-                <Trash2 className="size-4" />
-              </Button>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="h-fit rounded-xl border bg-card p-6">

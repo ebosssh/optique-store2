@@ -155,4 +155,55 @@ describe("POST /api/orders", () => {
     expect(createArgs.data.items.create.map((i: { diopter: string }) => i.diopter).sort()).toEqual(["-1.75", "-2.25"]);
     expect(createArgs.data.total).toBe(1560);
   });
+
+  it("rejects a toric LENSES product missing sphere/cylinder/axis", async () => {
+    findMany.mockResolvedValue([
+      { id: "p1", name: "Comfort Month Toric", type: "LENSES", isToric: true, price: 1290, inStock: true },
+    ]);
+
+    const res = await POST(makeRequest({ ...baseCustomer, items: [{ productId: "p1", quantity: 1, sphere: "-2.00" }] }));
+
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toMatch(/сферу, циліндр і вісь/);
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    [{ sphere: "-99.00", cylinder: "-1.25", axis: "90" }, "an out-of-range sphere"],
+    [{ sphere: "-2.00", cylinder: "-5.00", axis: "90" }, "an out-of-range cylinder"],
+    [{ sphere: "-2.00", cylinder: "-1.25", axis: "95" }, "an out-of-range axis"],
+  ])("rejects %s for a toric product", async (prescription) => {
+    findMany.mockResolvedValue([
+      { id: "p1", name: "Comfort Month Toric", type: "LENSES", isToric: true, price: 1290, inStock: true },
+    ]);
+
+    const res = await POST(makeRequest({ ...baseCustomer, items: [{ productId: "p1", quantity: 1, ...prescription }] }));
+
+    expect(res.status).toBe(400);
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it("accepts a toric LENSES product with a valid sphere/cylinder/axis", async () => {
+    findMany.mockResolvedValue([
+      { id: "p1", name: "Comfort Month Toric", type: "LENSES", isToric: true, price: 1290, inStock: true },
+    ]);
+    create.mockResolvedValue({ id: "order-5" });
+
+    const res = await POST(
+      makeRequest({
+        ...baseCustomer,
+        items: [{ productId: "p1", quantity: 1, sphere: "-2.00", cylinder: "-1.25", axis: "90" }],
+      })
+    );
+
+    expect(res.status).toBe(200);
+    const createArgs = create.mock.calls[0][0];
+    expect(createArgs.data.items.create[0]).toMatchObject({
+      productId: "p1",
+      sphere: "-2.00",
+      cylinder: "-1.25",
+      axis: "90",
+      diopter: null,
+    });
+  });
 });

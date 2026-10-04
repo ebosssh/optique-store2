@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/format";
+import { formatPrescriptionInline } from "@/lib/prescription";
 import { OrderStatusForm } from "@/components/admin/order-status-form";
 
 export const dynamic = "force-dynamic";
@@ -53,15 +54,18 @@ export default async function AdminOrderDetailPage({ params }: { params: Promise
       <div className="mt-6">
         <h2 className="font-semibold">Товари</h2>
         <ul className="mt-3 space-y-2 rounded-xl border bg-card p-4 text-sm">
-          {order.items.map((i) => (
-            <li key={i.id} className="flex justify-between">
-              <span className="text-muted-foreground">
-                {i.productName}
-                {i.diopter && ` (${i.diopter})`} × {i.quantity}
-              </span>
-              <span className="font-medium">{formatPrice(i.price * i.quantity)}</span>
-            </li>
-          ))}
+          {order.items.map((i) => {
+            const prescription = formatPrescriptionInline(i);
+            return (
+              <li key={i.id} className="flex justify-between">
+                <span className="text-muted-foreground">
+                  {i.productName}
+                  {prescription && ` (${prescription})`} × {i.quantity}
+                </span>
+                <span className="font-medium">{formatPrice(i.price * i.quantity)}</span>
+              </li>
+            );
+          })}
         </ul>
         <div className="mt-2 flex justify-between px-1 text-base font-bold">
           <span>Разом</span>

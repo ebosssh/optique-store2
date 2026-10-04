@@ -50,6 +50,7 @@ export async function createProduct(formData: FormData) {
     colorHex: String(formData.get("colorHex") ?? "#1f2937"),
     inStock: formData.get("inStock") === "on",
     isNew: formData.get("isNew") === "on",
+    isToric: formData.get("isToric") === "on",
   };
 
   for (let attempt = 0; attempt < 3; attempt++) {
@@ -92,6 +93,7 @@ export async function updateProduct(productId: string, formData: FormData) {
       colorHex: String(formData.get("colorHex") ?? "#1f2937"),
       inStock: formData.get("inStock") === "on",
       isNew: formData.get("isNew") === "on",
+      isToric: formData.get("isToric") === "on",
     },
   });
 

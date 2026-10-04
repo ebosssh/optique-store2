@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { CityWarehousePicker } from "@/components/checkout/city-warehouse-picker";
 import { useCart } from "@/store/cart";
 import { formatPrice } from "@/lib/format";
+import { formatPrescriptionInline } from "@/lib/prescription";
 import { cn } from "@/lib/utils";
 
 export default function CheckoutPage() {
@@ -45,7 +46,14 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           ...form,
           paymentType,
-          items: items.map((i) => ({ productId: i.productId, quantity: i.quantity, diopter: i.diopter })),
+          items: items.map((i) => ({
+            productId: i.productId,
+            quantity: i.quantity,
+            diopter: i.diopter,
+            sphere: i.sphere,
+            cylinder: i.cylinder,
+            axis: i.axis,
+          })),
         }),
       });
       if (!res.ok) {
@@ -119,15 +127,19 @@ export default function CheckoutPage() {
           <h2 className="font-semibold">Ваше замовлення</h2>
           <Separator className="my-4" />
           <ul className="space-y-2 text-sm">
-            {items.map((i) => (
-              <li key={`${i.productId}-${i.diopter ?? ""}`} className="flex justify-between gap-2">
-                <span className="line-clamp-1 text-muted-foreground">
-                  {i.name}
-                  {i.diopter && ` (${i.diopter})`} × {i.quantity}
-                </span>
-                <span className="shrink-0 font-medium">{formatPrice(i.price * i.quantity)}</span>
-              </li>
-            ))}
+            {items.map((i) => {
+              const prescription = formatPrescriptionInline(i);
+              const key = `${i.productId}-${i.diopter ?? ""}-${i.sphere ?? ""}-${i.cylinder ?? ""}-${i.axis ?? ""}`;
+              return (
+                <li key={key} className="flex justify-between gap-2">
+                  <span className="line-clamp-1 text-muted-foreground">
+                    {i.name}
+                    {prescription && ` (${prescription})`} × {i.quantity}
+                  </span>
+                  <span className="shrink-0 font-medium">{formatPrice(i.price * i.quantity)}</span>
+                </li>
+              );
+            })}
           </ul>
           <Separator className="my-4" />
           <div className="flex items-center justify-between text-lg font-bold">

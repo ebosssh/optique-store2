@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/store/cart";
 import { ProductImage } from "@/components/product-image";
 import { formatPrice } from "@/lib/format";
+import { formatPrescriptionLine } from "@/lib/prescription";
 
 export function CartSheet({ children }: { children: React.ReactNode }) {
   const { items, remove, setQuantity, totalPrice } = useCart();
@@ -31,41 +32,45 @@ export function CartSheet({ children }: { children: React.ReactNode }) {
         ) : (
           <>
             <div className="flex-1 space-y-4 overflow-y-auto px-4">
-              {items.map((item) => (
-                <div key={`${item.productId}-${item.diopter ?? ""}`} className="flex gap-3">
-                  <ProductImage type="GLASSES" colorHex={item.colorHex} imageUrl={item.imageUrl} className="w-20 shrink-0" />
-                  <div className="flex flex-1 flex-col gap-1">
-                    <span className="text-xs uppercase text-muted-foreground">{item.brand}</span>
-                    <span className="line-clamp-2 text-sm font-medium">{item.name}</span>
-                    {item.diopter && <span className="text-xs text-muted-foreground">Діоптрія: {item.diopter}</span>}
-                    <div className="mt-auto flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="icon"
-                          variant="outline"
-                          className="size-7"
-                          onClick={() => setQuantity(item.productId, item.quantity - 1, item.diopter)}
-                        >
-                          <Minus className="size-3" />
-                        </Button>
-                        <span className="w-4 text-center text-sm">{item.quantity}</span>
-                        <Button
-                          size="icon"
-                          variant="outline"
-                          className="size-7"
-                          onClick={() => setQuantity(item.productId, item.quantity + 1, item.diopter)}
-                        >
-                          <Plus className="size-3" />
-                        </Button>
+              {items.map((item) => {
+                const prescription = formatPrescriptionLine(item);
+                const key = `${item.productId}-${item.diopter ?? ""}-${item.sphere ?? ""}-${item.cylinder ?? ""}-${item.axis ?? ""}`;
+                return (
+                  <div key={key} className="flex gap-3">
+                    <ProductImage type="GLASSES" colorHex={item.colorHex} imageUrl={item.imageUrl} className="w-20 shrink-0" />
+                    <div className="flex flex-1 flex-col gap-1">
+                      <span className="text-xs uppercase text-muted-foreground">{item.brand}</span>
+                      <span className="line-clamp-2 text-sm font-medium">{item.name}</span>
+                      {prescription && <span className="text-xs text-muted-foreground">{prescription}</span>}
+                      <div className="mt-auto flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="icon"
+                            variant="outline"
+                            className="size-7"
+                            onClick={() => setQuantity(item, item.quantity - 1)}
+                          >
+                            <Minus className="size-3" />
+                          </Button>
+                          <span className="w-4 text-center text-sm">{item.quantity}</span>
+                          <Button
+                            size="icon"
+                            variant="outline"
+                            className="size-7"
+                            onClick={() => setQuantity(item, item.quantity + 1)}
+                          >
+                            <Plus className="size-3" />
+                          </Button>
+                        </div>
+                        <span className="text-sm font-semibold">{formatPrice(item.price * item.quantity)}</span>
                       </div>
-                      <span className="text-sm font-semibold">{formatPrice(item.price * item.quantity)}</span>
                     </div>
+                    <Button size="icon" variant="ghost" className="size-7 shrink-0" onClick={() => remove(item)}>
+                      <Trash2 className="size-4" />
+                    </Button>
                   </div>
-                  <Button size="icon" variant="ghost" className="size-7 shrink-0" onClick={() => remove(item.productId, item.diopter)}>
-                    <Trash2 className="size-4" />
-                  </Button>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <Separator />
             <SheetFooter>

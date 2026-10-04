@@ -13,18 +13,23 @@ export type CartItem = {
   imageEmoji: string;
   imageUrl: string | null;
   diopter: string | null;
+  sphere: string | null;
+  cylinder: string | null;
+  axis: string | null;
   quantity: number;
 };
 
-function sameLine(a: Pick<CartItem, "productId" | "diopter">, b: Pick<CartItem, "productId" | "diopter">): boolean {
-  return a.productId === b.productId && a.diopter === b.diopter;
+type LineKey = Pick<CartItem, "productId" | "diopter" | "sphere" | "cylinder" | "axis">;
+
+function sameLine(a: LineKey, b: LineKey): boolean {
+  return a.productId === b.productId && a.diopter === b.diopter && a.sphere === b.sphere && a.cylinder === b.cylinder && a.axis === b.axis;
 }
 
 type CartState = {
   items: CartItem[];
   add: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
-  remove: (productId: string, diopter?: string | null) => void;
-  setQuantity: (productId: string, quantity: number, diopter?: string | null) => void;
+  remove: (line: LineKey) => void;
+  setQuantity: (line: LineKey, quantity: number) => void;
   clear: () => void;
   totalCount: () => number;
   totalPrice: () => number;
@@ -45,13 +50,10 @@ export const useCart = create<CartState>()(
           return { items: [...state.items, { ...item, quantity }] };
         });
       },
-      remove: (productId, diopter = null) =>
-        set((state) => ({ items: state.items.filter((i) => !sameLine(i, { productId, diopter })) })),
-      setQuantity: (productId, quantity, diopter = null) =>
+      remove: (line) => set((state) => ({ items: state.items.filter((i) => !sameLine(i, line)) })),
+      setQuantity: (line, quantity) =>
         set((state) => ({
-          items: state.items
-            .map((i) => (sameLine(i, { productId, diopter }) ? { ...i, quantity } : i))
-            .filter((i) => i.quantity > 0),
+          items: state.items.map((i) => (sameLine(i, line) ? { ...i, quantity } : i)).filter((i) => i.quantity > 0),
         })),
       clear: () => set({ items: [] }),
       totalCount: () => get().items.reduce((sum, i) => sum + i.quantity, 0),

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { notifyNewOrder } from "@/lib/telegram";
 import { DIOPTER_OPTIONS } from "@/lib/diopter";
+import { AXIS_OPTIONS, CYLINDER_OPTIONS } from "@/lib/toric";
 
 type OrderPayload = {
   name: string;
@@ -10,12 +11,31 @@ type OrderPayload = {
   address: string;
   comment?: string;
   paymentType: string;
-  items: { productId: string; quantity: number; diopter?: string | null }[];
+  items: {
+    productId: string;
+    quantity: number;
+    diopter?: string | null;
+    sphere?: string | null;
+    cylinder?: string | null;
+    axis?: string | null;
+  }[];
 };
 
-type Line = { productId: string; diopter: string | null; quantity: number };
+type Line = {
+  productId: string;
+  diopter: string | null;
+  sphere: string | null;
+  cylinder: string | null;
+  axis: string | null;
+  quantity: number;
+};
 
 const MAX_QUANTITY_PER_ITEM = 50;
+
+function normalize(value: string | null | undefined): string | null {
+  const trimmed = value ? String(value).trim() : "";
+  return trimmed || null;
+}
 
 export async function POST(request: Request) {
   const body = (await request.json()) as OrderPayload;
@@ -27,22 +47,35 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Кошик порожній" }, { status: 400 });
   }
 
-  // A diopter distinguishes otherwise-identical lines, so two different
-  // diopters of the same product must stay separate order lines.
+  // A diopter, or a sphere/cylinder/axis combination, distinguishes
+  // otherwise-identical lines, so two different prescriptions of the same
+  // product must stay separate order lines.
   const lines = new Map<string, Line>();
   for (const i of body.items) {
     const quantity = Math.trunc(Number(i.quantity));
     if (!i.productId || !Number.isFinite(quantity) || quantity <= 0 || quantity > MAX_QUANTITY_PER_ITEM) {
       return NextResponse.json({ error: "Некоректний товар у кошику" }, { status: 400 });
     }
-    const diopter = i.diopter ? String(i.diopter).trim() : null;
+    const diopter = normalize(i.diopter);
+    const sphere = normalize(i.sphere);
+    const cylinder = normalize(i.cylinder);
+    const axis = normalize(i.axis);
     if (diopter && !DIOPTER_OPTIONS.includes(diopter)) {
       return NextResponse.json({ error: "Некоректна діоптрія" }, { status: 400 });
     }
-    const key = `${i.productId}::${diopter ?? ""}`;
+    if (sphere && !DIOPTER_OPTIONS.includes(sphere)) {
+      return NextResponse.json({ error: "Некоректна сфера" }, { status: 400 });
+    }
+    if (cylinder && !CYLINDER_OPTIONS.includes(cylinder)) {
+      return NextResponse.json({ error: "Некоректний циліндр" }, { status: 400 });
+    }
+    if (axis && !AXIS_OPTIONS.includes(axis)) {
+      return NextResponse.json({ error: "Некоректна вісь" }, { status: 400 });
+    }
+    const key = `${i.productId}::${diopter ?? ""}::${sphere ?? ""}::${cylinder ?? ""}::${axis ?? ""}`;
     const existing = lines.get(key);
     if (existing) existing.quantity += quantity;
-    else lines.set(key, { productId: i.productId, diopter, quantity });
+    else lines.set(key, { productId: i.productId, diopter, sphere, cylinder, axis, quantity });
   }
 
   const productIds = [...new Set([...lines.values()].map((l) => l.productId))];
@@ -58,7 +91,12 @@ export async function POST(request: Request) {
 
   for (const line of lines.values()) {
     const product = productById.get(line.productId)!;
-    if (product.type === "LENSES" && !line.diopter) {
+    if (product.type !== "LENSES") continue;
+    if (product.isToric) {
+      if (!line.sphere || !line.cylinder || !line.axis) {
+        return NextResponse.json({ error: `Вкажіть сферу, циліндр і вісь для товару «${product.name}»` }, { status: 400 });
+      }
+    } else if (!line.diopter) {
       return NextResponse.json({ error: `Вкажіть діоптрію для товару «${product.name}»` }, { status: 400 });
     }
   }
@@ -69,6 +107,9 @@ export async function POST(request: Request) {
       productId: product.id,
       productName: product.name,
       diopter: line.diopter,
+      sphere: line.sphere,
+      cylinder: line.cylinder,
+      axis: line.axis,
       price: product.price,
       quantity: line.quantity,
     };
