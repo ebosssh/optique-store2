@@ -12,7 +12,7 @@ export const SITE = {
   email: "info@optikazir.ua",
   city: "Первомайськ",
   address: "вул. Шевченка, 15",
-  hours: "Пн–Нд: 09:00–20:00",
+  hours: "Пн–Пт: 09:00–18:00, Сб: 09:00–17:00, Нд: 09:00–16:00",
   instagram: "https://instagram.com",
 };
 
