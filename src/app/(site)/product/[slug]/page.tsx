@@ -55,10 +55,12 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
               <dt className="text-muted-foreground">Бренд</dt>
               <dd className="font-medium">{product.brand}</dd>
             </div>
-            <div>
-              <dt className="text-muted-foreground">Стать</dt>
-              <dd className="font-medium capitalize">{product.gender}</dd>
-            </div>
+            {(product.type === "GLASSES" || product.type === "SUNGLASSES") && (
+              <div>
+                <dt className="text-muted-foreground">Стать</dt>
+                <dd className="font-medium capitalize">{product.gender}</dd>
+              </div>
+            )}
             {product.packSize && (
               <div>
                 <dt className="text-muted-foreground">Формат</dt>
