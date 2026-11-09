@@ -43,6 +43,9 @@ export async function POST(request: Request) {
   if (!body.name?.trim() || !body.phone?.trim() || !body.city?.trim() || !body.address?.trim()) {
     return NextResponse.json({ error: "Заповніть обов'язкові поля" }, { status: 400 });
   }
+  if (body.paymentType !== "cod" && body.paymentType !== "card") {
+    return NextResponse.json({ error: "Оберіть спосіб оплати" }, { status: 400 });
+  }
   if (!body.items?.length) {
     return NextResponse.json({ error: "Кошик порожній" }, { status: 400 });
   }
@@ -82,9 +85,6 @@ export async function POST(request: Request) {
   const products = await prisma.product.findMany({ where: { id: { in: productIds } } });
   if (products.length !== productIds.length) {
     return NextResponse.json({ error: "Деякі товари більше не доступні" }, { status: 400 });
-  }
-  if (products.some((p) => !p.inStock)) {
-    return NextResponse.json({ error: "Деякі товари закінчились на складі" }, { status: 400 });
   }
 
   const productById = new Map(products.map((p) => [p.id, p]));

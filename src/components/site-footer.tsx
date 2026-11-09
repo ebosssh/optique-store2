@@ -14,9 +14,11 @@ export function SiteFooter() {
           <p className="mt-3 text-sm text-muted-foreground">
             Салон оптики: окуляри, контактні лінзи, аксесуари та запис на прийом до лікаря-офтальмолога.
           </p>
-          <a href={SITE.instagram} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex text-muted-foreground hover:text-primary">
-            <Share2 className="size-5" />
-          </a>
+          {SITE.instagram && (
+            <a href={SITE.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="mt-3 inline-flex text-muted-foreground hover:text-primary">
+              <Share2 className="size-5" />
+            </a>
+          )}
         </div>
 
         <div>
@@ -51,7 +53,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} {SITE.name}. Усі права захищено. Демонстраційний сайт.
+        © {new Date().getFullYear()} {SITE.name}. Усі права захищено.
       </div>
     </footer>
   );

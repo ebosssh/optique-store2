@@ -27,6 +27,7 @@ const baseCustomer = {
   phone: "+380671234567",
   city: "Київ",
   address: "Відділення №12",
+  paymentType: "cod",
 };
 
 describe("POST /api/orders", () => {
@@ -60,11 +61,18 @@ describe("POST /api/orders", () => {
     expect((await res.json()).error).toMatch(/доступні/);
   });
 
-  it("rejects the order when a product is out of stock", async () => {
+  it("accepts a product shown as made to order (not in stock)", async () => {
     findMany.mockResolvedValue([{ id: "p1", name: "Test", price: 1000, inStock: false }]);
+    create.mockResolvedValue({ id: "order-1" });
     const res = await POST(makeRequest({ ...baseCustomer, items: [{ productId: "p1", quantity: 1 }] }));
+    expect(res.status).toBe(200);
+    expect(create).toHaveBeenCalledOnce();
+  });
+
+  it("rejects an unknown payment type", async () => {
+    const res = await POST(makeRequest({ ...baseCustomer, paymentType: "crypto", items: [{ productId: "p1", quantity: 1 }] }));
     expect(res.status).toBe(400);
-    expect((await res.json()).error).toMatch(/складі/);
+    expect(findMany).not.toHaveBeenCalled();
   });
 
   it("prices the order from the database and ignores any price the client sends", async () => {

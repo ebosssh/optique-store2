@@ -1,9 +1,20 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { ADMIN_COOKIE, verifySessionToken } from "@/lib/admin-auth";
+
+// Server actions are public HTTP endpoints, so each one must check the admin
+// session itself — the /admin proxy only guards page navigation.
+async function requireAdmin(): Promise<void> {
+  const token = (await cookies()).get(ADMIN_COOKIE)?.value;
+  if (!(await verifySessionToken(token))) redirect("/admin/login");
+}
+
+const ORDER_STATUSES = ["NEW", "CONFIRMED", "CANCELLED"] as const;
 
 function randomSlugSuffix(): string {
   return Math.random().toString(36).slice(2, 8);
@@ -30,6 +41,7 @@ function revalidateStorefront(categorySlug?: string, slug?: string) {
 }
 
 export async function createProduct(formData: FormData) {
+  await requireAdmin();
   const categoryId = String(formData.get("categoryId") ?? "");
   const category = await prisma.category.findUniqueOrThrow({ where: { id: categoryId } });
 
@@ -69,6 +81,7 @@ export async function createProduct(formData: FormData) {
 }
 
 export async function updateProduct(productId: string, formData: FormData) {
+  await requireAdmin();
   const categoryId = String(formData.get("categoryId") ?? "");
   const category = await prisma.category.findUniqueOrThrow({ where: { id: categoryId } });
 
@@ -102,6 +115,7 @@ export async function updateProduct(productId: string, formData: FormData) {
 }
 
 export async function deleteProduct(productId: string) {
+  await requireAdmin();
   const existing = await prisma.product.delete({
     where: { id: productId },
     include: { category: true },
@@ -111,6 +125,8 @@ export async function deleteProduct(productId: string) {
 }
 
 export async function updateOrderStatus(orderId: string, status: "NEW" | "CONFIRMED" | "CANCELLED") {
+  await requireAdmin();
+  if (!ORDER_STATUSES.includes(status)) throw new Error("Некоректний статус");
   await prisma.order.update({ where: { id: orderId }, data: { status } });
   revalidatePath(`/admin/orders/${orderId}`);
   revalidatePath("/admin/orders");

@@ -13,7 +13,8 @@ export const SITE = {
   city: "Первомайськ",
   address: "вул. Шевченка, 15",
   hours: "Пн–Пт: 09:00–18:00, Сб: 09:00–17:00, Нд: 09:00–16:00",
-  instagram: "https://instagram.com",
+  // Set to the shop's real profile URL to show the icon in the footer.
+  instagram: null as string | null,
 };
 
 export const CATEGORY_LABELS: Record<string, { title: string; description: string }> = {
