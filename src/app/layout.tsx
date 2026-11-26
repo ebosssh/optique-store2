@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Nunito, Playfair_Display, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const sans = Nunito({
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
         {children}
+        <Analytics />
       </body>
     </html>
   );
